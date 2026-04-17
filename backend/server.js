@@ -46,6 +46,25 @@ app.use('/api/notifications', notificationRoutes)
 app.use('/api/requests', requestRoutes)
 app.use('/api/files', fileRoutes)
 
+// Root route - Add this to fix "Cannot GET /"
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Final Year Project Management System API',
+    version: '1.0.0',
+    endpoints: {
+      login: '/api/login',
+      verify: '/api/verify',
+      students: '/api/students',
+      teachers: '/api/teachers',
+      proposals: '/api/proposals',
+      notifications: '/api/notifications',
+      requests: '/api/requests',
+      files: '/api/files'
+    }
+  })
+})
+
 // Admin credentials from .env
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD
@@ -206,13 +225,12 @@ app.get('/api/test', (req, res) => {
 // For Vercel serverless function - export the app
 export default app
 
-
-
 // Start server only when running locally (not in Vercel)
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
     console.log(`\n🚀 Server running on http://localhost:${PORT}`)
     console.log('\n📝 Available endpoints:')
+    console.log(`  GET    http://localhost:${PORT}/`)
     console.log(`  POST   http://localhost:${PORT}/api/login`)
     console.log(`  POST   http://localhost:${PORT}/api/verify`)
     console.log(`  GET    http://localhost:${PORT}/api/test`)
