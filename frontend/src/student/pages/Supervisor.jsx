@@ -25,7 +25,8 @@ function Supervisor() {
   const [selectedProject, setSelectedProject] = useState(null)
   const [error, setError] = useState(null)
 
-  const API_URL = 'http://localhost:5000/api'
+  // With this:
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
   // Fetch all data
   const fetchData = async () => {
