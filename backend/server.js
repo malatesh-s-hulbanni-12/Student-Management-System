@@ -206,6 +206,8 @@ app.get('/api/test', (req, res) => {
 // For Vercel serverless function - export the app
 export default app
 
+
+
 // Start server only when running locally (not in Vercel)
 if (process.env.NODE_ENV !== 'production') {
   app.listen(PORT, () => {
