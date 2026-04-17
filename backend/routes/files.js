@@ -1,7 +1,13 @@
+import dotenv from 'dotenv'
+dotenv.config()
+
+
 import express from 'express'
 import multer from 'multer'
 import path from 'path'
 import fs from 'fs'
+import { v2 as cloudinary } from 'cloudinary'
+import { Readable } from 'stream'
 import File from '../models/File.js'
 import Proposal from '../models/Proposal.js'
 import { authenticateToken } from '../middleware/auth.js'
@@ -9,20 +15,22 @@ import { createNotification } from './notifications.js'
 
 const router = express.Router()
 
-// Configure multer for file storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = 'uploads/'
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true })
-    }
-    cb(null, uploadDir)
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, uniqueSuffix + path.extname(file.originalname))
-  }
+// Configure Cloudinary
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 })
+
+// Debug
+console.log('=== CLOUDINARY CONFIG IN FILES.JS ===')
+console.log('Cloud Name:', process.env.CLOUDINARY_CLOUD_NAME || '❌')
+console.log('API Key:', process.env.CLOUDINARY_API_KEY ? '✅' : '❌')
+console.log('API Secret:', process.env.CLOUDINARY_API_SECRET ? '✅' : '❌')
+
+// Configure multer for memory storage (since Cloudinary handles the file)
+const storage = multer.memoryStorage()
 
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation']
@@ -39,7 +47,7 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
 })
 
-// Upload file
+// Upload file to Cloudinary
 router.post('/upload', authenticateToken, upload.single('file'), async (req, res) => {
   try {
     console.log('=== FILE UPLOAD REQUEST ===')
@@ -65,6 +73,28 @@ router.post('/upload', authenticateToken, upload.single('file'), async (req, res
     console.log('Proposal found:', proposal.projectTitle)
     console.log('Assigned supervisor:', proposal.assignedSupervisor)
 
+    // Upload to Cloudinary
+    const uploadResult = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'student_projects',
+          resource_type: 'auto',
+          public_id: `${Date.now()}-${Math.round(Math.random() * 1E9)}`
+        },
+        (error, result) => {
+          if (error) reject(error)
+          else resolve(result)
+        }
+      )
+      
+      const readableStream = new Readable()
+      readableStream.push(req.file.buffer)
+      readableStream.push(null)
+      readableStream.pipe(uploadStream)
+    })
+
+    console.log('Cloudinary upload result:', uploadResult.secure_url)
+
     const file = new File({
       studentId: req.user.id,
       studentName: req.user.name,
@@ -72,8 +102,8 @@ router.post('/upload', authenticateToken, upload.single('file'), async (req, res
       proposalId: proposalId,
       projectTitle: projectTitle,
       fileType: fileType,
-      fileName: req.file.filename,
-      fileUrl: `/uploads/${req.file.filename}`,
+      fileName: uploadResult.public_id,
+      fileUrl: uploadResult.secure_url,
       fileSize: (req.file.size / (1024 * 1024)).toFixed(2) + ' MB',
       fileOriginalName: req.file.originalname,
       mimeType: req.file.mimetype
@@ -89,7 +119,6 @@ router.post('/upload', authenticateToken, upload.single('file'), async (req, res
       
       console.log('Sending notification to teacher:', teacherId, teacherName)
       
-      // Create notification for teacher
       const notification = await createNotification(
         teacherId,
         'teacher',
@@ -177,7 +206,7 @@ router.get('/teacher-files', authenticateToken, async (req, res) => {
   }
 })
 
-// Delete file
+// Delete file from Cloudinary and database
 router.delete('/:id', authenticateToken, async (req, res) => {
   try {
     const file = await File.findById(req.params.id)
@@ -191,10 +220,12 @@ router.delete('/:id', authenticateToken, async (req, res) => {
       return res.status(403).json({ success: false, message: 'Unauthorized' })
     }
 
-    // Delete physical file
-    const filePath = path.join(process.cwd(), file.fileUrl)
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath)
+    // Delete file from Cloudinary
+    try {
+      await cloudinary.uploader.destroy(file.fileName)
+      console.log('File deleted from Cloudinary:', file.fileName)
+    } catch (cloudinaryError) {
+      console.error('Error deleting from Cloudinary:', cloudinaryError)
     }
 
     await File.findByIdAndDelete(req.params.id)

@@ -1,6 +1,11 @@
+
+import dotenv from 'dotenv'
+// Load environment variables FIRST, before any other imports
+dotenv.config()
+
+
 import express from 'express'
 import cors from 'cors'
-import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
@@ -18,7 +23,13 @@ import fileRoutes from './routes/files.js'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-dotenv.config()
+
+
+// Debug - Check Cloudinary credentials
+console.log('=== ENVIRONMENT VARIABLES CHECK ===')
+console.log('CLOUDINARY_CLOUD_NAME:', process.env.CLOUDINARY_CLOUD_NAME || '❌ MISSING')
+console.log('CLOUDINARY_API_KEY:', process.env.CLOUDINARY_API_KEY ? '✅ PRESENT' : '❌ MISSING')
+console.log('CLOUDINARY_API_SECRET:', process.env.CLOUDINARY_API_SECRET ? '✅ PRESENT' : '❌ MISSING')
 
 const app = express()
 const PORT = process.env.PORT || 5000
