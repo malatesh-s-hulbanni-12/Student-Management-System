@@ -21,12 +21,14 @@ function Supervisor() {
     requestType: 'meeting',
     message: ''
   })
-  const [allProposals, setAllProposals] = useState([])  // All proposals for dropdown
+  const [allProposals, setAllProposals] = useState([])
   const [selectedProject, setSelectedProject] = useState(null)
   const [error, setError] = useState(null)
 
-  // With this:
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+  // Base URL from env (without /api)
+  const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  // API URL with /api prefix
+  const API_URL = `${BASE_URL}/api`
 
   // Fetch all data
   const fetchData = async () => {
@@ -36,6 +38,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
       const token = localStorage.getItem('token')
       const user = JSON.parse(localStorage.getItem('user') || '{}')
       console.log('Current user:', user)
+      console.log('API_URL:', API_URL)
       
       // Fetch assigned supervisors (my-supervisors)
       if (token && user.role === 'student') {
@@ -53,7 +56,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
         }
       }
       
-      // Fetch all teachers
+      // Fetch all teachers using public endpoint
       console.log('Fetching all teachers...')
       const teachersRes = await axios.get(`${API_URL}/teachers/public-list`)
       console.log('All teachers response:', teachersRes.data)
@@ -65,7 +68,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
         setError(teachersRes.data.message || 'Failed to load teachers')
       }
       
-      // Fetch ALL proposals for dropdown (not just approved)
+      // Fetch ALL proposals for dropdown
       if (token && user.role === 'student') {
         try {
           const proposalsRes = await axios.get(`${API_URL}/proposals/my-proposals`, {
@@ -74,7 +77,6 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
           console.log('All proposals response:', proposalsRes.data)
           
           if (proposalsRes.data.success) {
-            // Show all proposals in dropdown, with status indicator
             setAllProposals(proposalsRes.data.proposals)
           }
         } catch (projectError) {
@@ -477,7 +479,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
                 <p className="text-sm text-gray-500">{selectedTeacher.email}</p>
               </div>
               
-              {/* Project Selection Dropdown - Shows ALL proposals */}
+              {/* Project Selection Dropdown */}
               <div className="mb-4">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Related Project (Optional)
@@ -493,7 +495,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
                   <option value="">-- No specific project --</option>
                   {allProposals.map((project) => (
                     <option key={project._id} value={project._id}>
-                                      {project.projectTitle} ({project.status.toUpperCase()})
+                      {project.projectTitle} ({project.status.toUpperCase()})
                     </option>
                   ))}
                 </select>
@@ -533,7 +535,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
                 <p className="text-sm text-gray-500">{selectedTeacher.email}</p>
               </div>
               
-              {/* Project Selection Dropdown - Shows ALL proposals */}
+              {/* Project Selection Dropdown */}
               <div className="mb-4">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Related Project (Optional)
