@@ -266,7 +266,7 @@ function Supervisor() {
         </div>
         <button
           onClick={fetchData}
-          className="bg-gray-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-600 transition-all"
+          className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all"
         >
           <FiRefreshCw size={18} />
           Refresh
@@ -281,67 +281,64 @@ function Supervisor() {
           </h3>
           <div className="space-y-4">
             {assignedSupervisors.map((item, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-sm overflow-hidden border-l-4 border-primary-500">
+              <div key={index} className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
                 <div 
-                  className="p-6 cursor-pointer hover:bg-gray-50 transition-colors"
+                  className="p-5 cursor-pointer hover:bg-gray-50 transition-colors"
                   onClick={() => toggleAssignedCard(index)}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4 flex-1">
-                      <div className="w-16 h-16 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+                      <div className="w-14 h-14 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-xl font-bold">
                         {item.supervisor?.name?.charAt(0) || 'S'}
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-xl font-bold text-gray-800">{item.supervisor?.name}</h3>
-                        <p className="text-sm text-gray-500">Employee ID: {item.supervisor?.id}</p>
+                        <h3 className="text-lg font-bold text-gray-800">{item.supervisor?.name}</h3>
+                        <p className="text-sm text-gray-500">ID: {item.supervisor?.id}</p>
                         <p className="text-xs text-gray-400 mt-1">Project: {item.projectTitle?.substring(0, 50)}...</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(item.projectStatus)}`}>
+                    <div className="flex items-center gap-3">
+                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(item.projectStatus)}`}>
                         {item.projectStatus?.toUpperCase()}
                       </span>
-                      {expandedCard === index ? <FiChevronUp size={20} /> : <FiChevronDown size={20} />}
+                      {expandedCard === index ? <FiChevronUp size={18} /> : <FiChevronDown size={18} />}
                     </div>
                   </div>
                 </div>
                 {expandedCard === index && (
-                  <div className="border-t border-gray-100 p-6 bg-gray-50">
+                  <div className="border-t border-gray-200 p-5 bg-gray-50">
                     <div className="mb-4">
                       <h4 className="font-semibold text-gray-700 mb-2">Project Details</h4>
-                      <div className="bg-white rounded-lg p-4">
+                      <div className="bg-white border border-gray-200 rounded-lg p-4">
                         <p className="font-medium text-gray-800">{item.projectTitle}</p>
-                        <div className="grid grid-cols-2 gap-4 mt-3 text-sm">
-                          <div><span className="text-gray-500">Roll Number:</span> {item.rollNumber}</div>
-                          <div><span className="text-gray-500">Department:</span> {item.department}</div>
-                          <div><span className="text-gray-500">Semester:</span> Semester {item.semester}</div>
+                        <div className="grid grid-cols-2 gap-3 mt-3 text-sm">
+                          <div><span className="text-gray-500">Roll:</span> {item.rollNumber}</div>
+                          <div><span className="text-gray-500">Dept:</span> {item.department}</div>
+                          <div><span className="text-gray-500">Sem:</span> {item.semester}</div>
                         </div>
                       </div>
                     </div>
                     <div className="mb-4">
-                      <h4 className="font-semibold text-gray-700 mb-2">Contact Information</h4>
-                      <div className="bg-white rounded-lg p-4">
+                      <h4 className="font-semibold text-gray-700 mb-2">Contact</h4>
+                      <div className="bg-white border border-gray-200 rounded-lg p-4">
                         <div className="flex items-center gap-3">
-                          <FiMail className="text-gray-400" />
-                          <div>
-                            <p className="text-xs text-gray-500">Email</p>
-                            <p className="text-sm text-gray-800">{item.supervisor?.email}</p>
-                          </div>
+                          <FiMail className="text-gray-400" size={16} />
+                          <span className="text-sm text-gray-700">{item.supervisor?.email}</span>
                         </div>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <button
                         onClick={() => openMessageModal(item.supervisor)}
-                        className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white py-2 rounded-lg flex items-center justify-center gap-2 hover:shadow-lg transition-all"
+                        className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg flex items-center justify-center gap-2 transition-all"
                       >
-                        <FiMessageSquare size={16} /> Send Message
+                        <FiMessageSquare size={14} /> Send Message
                       </button>
                       <button
                         onClick={() => openRequestModal(item.supervisor)}
-                        className="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-2 rounded-lg flex items-center justify-center gap-2 hover:shadow-lg transition-all"
+                        className="bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-lg flex items-center justify-center gap-2 transition-all"
                       >
-                        <FiSend size={16} /> Send Request
+                        <FiSend size={14} /> Send Request
                       </button>
                     </div>
                   </div>
@@ -367,28 +364,28 @@ function Supervisor() {
               placeholder="Search by name, department, or employee ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
 
-        {/* Stats Summary */}
+        {/* Stats Summary - Simple Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 text-white">
+          <div className="bg-blue-600 text-white rounded-xl p-4">
             <div className="text-2xl mb-1">👨‍🏫</div>
             <div className="text-2xl font-bold">{allTeachers.length}</div>
-            <div className="text-sm opacity-90">Total Faculty Members</div>
+            <div className="text-sm opacity-90">Total Faculty</div>
           </div>
-          <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-4 text-white">
+          <div className="bg-green-600 text-white rounded-xl p-4">
             <div className="text-2xl mb-1">📚</div>
             <div className="text-2xl font-bold">{allProposals.length}</div>
-            <div className="text-sm opacity-90">Your Total Proposals</div>
+            <div className="text-sm opacity-90">Your Proposals</div>
           </div>
         </div>
 
-        {/* All Teachers List */}
+        {/* All Teachers List - Square Cards */}
         {filteredTeachers.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm p-8 text-center">
+          <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
             <div className="text-6xl mb-4">👨‍🏫</div>
             <h3 className="text-xl font-bold text-gray-800 mb-2">No Teachers Found</h3>
             <p className="text-gray-600">
@@ -396,64 +393,52 @@ function Supervisor() {
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredTeachers.map((teacher, index) => (
-              <div key={teacher._id} className="bg-white rounded-xl shadow-sm overflow-hidden">
+              <div key={teacher._id} className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all">
                 <div 
-                  className="p-6 cursor-pointer hover:bg-gray-50 transition-colors"
+                  className="p-5 cursor-pointer"
                   onClick={() => toggleTeacherCard(index)}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 flex-1">
-                      <div className="w-16 h-16 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
-                        {teacher.name?.charAt(0) || 'T'}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold text-gray-800">{teacher.name}</h3>
-                        <p className="text-sm text-gray-500">Employee ID: {teacher.employeeId}</p>
-                        <p className="text-sm text-gray-600">{teacher.designation} - {teacher.department}</p>
-                      </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-lg font-bold">
+                      {teacher.name?.charAt(0) || 'T'}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-bold text-gray-800">{teacher.name}</h3>
+                      <p className="text-xs text-gray-500">{teacher.employeeId}</p>
+                      <p className="text-xs text-gray-600 mt-1">{teacher.designation}</p>
                     </div>
                     <div>
-                      {expandedTeacherCard === index ? <FiChevronUp size={20} /> : <FiChevronDown size={20} />}
+                      {expandedTeacherCard === index ? <FiChevronUp size={18} className="text-gray-400" /> : <FiChevronDown size={18} className="text-gray-400" />}
                     </div>
                   </div>
                 </div>
                 {expandedTeacherCard === index && (
-                  <div className="border-t border-gray-100 p-6 bg-gray-50">
-                    <div className="mb-4">
-                      <h4 className="font-semibold text-gray-700 mb-2">Contact Information</h4>
-                      <div className="bg-white rounded-lg p-4">
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-3">
-                            <FiMail className="text-gray-400" />
-                            <div>
-                              <p className="text-xs text-gray-500">Email</p>
-                              <p className="text-sm text-gray-800">{teacher.email}</p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <FiUser className="text-gray-400" />
-                            <div>
-                              <p className="text-xs text-gray-500">Employee ID</p>
-                              <p className="text-sm text-gray-800">{teacher.employeeId}</p>
-                            </div>
-                          </div>
-                        </div>
+                  <div className="border-t border-gray-200 p-4 bg-gray-50">
+                    <div className="mb-3">
+                      <p className="text-xs text-gray-500 mb-1">Department</p>
+                      <p className="text-sm text-gray-700">{teacher.department}</p>
+                    </div>
+                    <div className="mb-3">
+                      <p className="text-xs text-gray-500 mb-1">Email</p>
+                      <div className="flex items-center gap-2">
+                        <FiMail className="text-gray-400" size={14} />
+                        <span className="text-sm text-gray-700 break-all">{teacher.email}</span>
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2 mt-3">
                       <button
                         onClick={() => openMessageModal(teacher)}
-                        className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white py-2 rounded-lg flex items-center justify-center gap-2 hover:shadow-lg transition-all"
+                        className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg flex items-center justify-center gap-2 text-sm transition-all"
                       >
-                        <FiMessageSquare size={16} /> Send Message
+                        <FiMessageSquare size={14} /> Message
                       </button>
                       <button
                         onClick={() => openRequestModal(teacher)}
-                        className="bg-gradient-to-r from-orange-500 to-orange-600 text-white py-2 rounded-lg flex items-center justify-center gap-2 hover:shadow-lg transition-all"
+                        className="bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-lg flex items-center justify-center gap-2 text-sm transition-all"
                       >
-                        <FiSend size={16} /> Send Request
+                        <FiSend size={14} /> Request
                       </button>
                     </div>
                   </div>
@@ -468,15 +453,15 @@ function Supervisor() {
       {showMessageModal && selectedTeacher && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-            <div className="flex justify-between items-center p-6 border-b border-gray-200">
-              <h3 className="text-xl font-bold text-gray-800">Send Message to {selectedTeacher.name}</h3>
+            <div className="flex justify-between items-center p-5 border-b border-gray-200">
+              <h3 className="text-lg font-bold text-gray-800">Send Message to {selectedTeacher.name}</h3>
               <button onClick={() => setShowMessageModal(false)} className="text-gray-400 hover:text-gray-600">✕</button>
             </div>
-            <div className="p-6">
-              <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                <p className="text-sm text-gray-600 mb-1">👨‍🏫 To:</p>
+            <div className="p-5">
+              <div className="bg-gray-50 p-3 rounded-lg mb-4">
+                <p className="text-xs text-gray-500 mb-1">To:</p>
                 <p className="font-medium text-gray-800">{selectedTeacher.name}</p>
-                <p className="text-sm text-gray-500">{selectedTeacher.email}</p>
+                <p className="text-xs text-gray-500">{selectedTeacher.email}</p>
               </div>
               
               {/* Project Selection Dropdown */}
@@ -490,7 +475,7 @@ function Supervisor() {
                     const project = allProposals.find(p => p._id === e.target.value)
                     setSelectedProject(project || null)
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">-- No specific project --</option>
                   {allProposals.map((project) => (
@@ -499,20 +484,19 @@ function Supervisor() {
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-gray-500 mt-1">Select a project to associate with this message</p>
               </div>
 
               <textarea
                 value={messageText}
                 onChange={(e) => setMessageText(e.target.value)}
-                rows="5"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                rows="4"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder={`Type your message to ${selectedTeacher.name}...`}
               />
-              <div className="flex justify-end gap-3 mt-6">
-                <button onClick={() => setShowMessageModal(false)} className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg">Cancel</button>
-                <button onClick={handleSendMessage} disabled={sending || !messageText.trim()} className="px-4 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg flex items-center gap-2">
-                  <FiSend size={16} /> {sending ? 'Sending...' : 'Send Message'}
+              <div className="flex justify-end gap-3 mt-5">
+                <button onClick={() => setShowMessageModal(false)} className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+                <button onClick={handleSendMessage} disabled={sending || !messageText.trim()} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2">
+                  <FiSend size={14} /> {sending ? 'Sending...' : 'Send Message'}
                 </button>
               </div>
             </div>
@@ -524,15 +508,15 @@ function Supervisor() {
       {showRequestModal && selectedTeacher && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-            <div className="flex justify-between items-center p-6 border-b border-gray-200">
-              <h3 className="text-xl font-bold text-gray-800">Send Request to {selectedTeacher.name}</h3>
+            <div className="flex justify-between items-center p-5 border-b border-gray-200">
+              <h3 className="text-lg font-bold text-gray-800">Send Request to {selectedTeacher.name}</h3>
               <button onClick={() => setShowRequestModal(false)} className="text-gray-400 hover:text-gray-600">✕</button>
             </div>
-            <div className="p-6">
-              <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                <p className="text-sm text-gray-600 mb-1">👨‍🏫 To:</p>
+            <div className="p-5">
+              <div className="bg-gray-50 p-3 rounded-lg mb-4">
+                <p className="text-xs text-gray-500 mb-1">To:</p>
                 <p className="font-medium text-gray-800">{selectedTeacher.name}</p>
-                <p className="text-sm text-gray-500">{selectedTeacher.email}</p>
+                <p className="text-xs text-gray-500">{selectedTeacher.email}</p>
               </div>
               
               {/* Project Selection Dropdown */}
@@ -546,7 +530,7 @@ function Supervisor() {
                     const project = allProposals.find(p => p._id === e.target.value)
                     setSelectedProject(project || null)
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">-- No specific project --</option>
                   {allProposals.map((project) => (
@@ -555,7 +539,6 @@ function Supervisor() {
                     </option>
                   ))}
                 </select>
-                <p className="text-xs text-gray-500 mt-1">Select a project to associate with this request</p>
               </div>
 
               {/* Request Type Selection */}
@@ -584,16 +567,16 @@ function Supervisor() {
                 <textarea
                   value={requestData.message}
                   onChange={(e) => setRequestData({ ...requestData, message: e.target.value })}
-                  rows="5"
+                  rows="4"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   placeholder="Please describe your request in detail..."
                 />
               </div>
 
-              <div className="flex justify-end gap-3 mt-6">
-                <button onClick={() => setShowRequestModal(false)} className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg">Cancel</button>
-                <button onClick={handleSendRequest} disabled={sending || !requestData.message.trim()} className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg flex items-center gap-2">
-                  <FiSend size={16} /> {sending ? 'Sending...' : 'Send Request'}
+              <div className="flex justify-end gap-3 mt-5">
+                <button onClick={() => setShowRequestModal(false)} className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
+                <button onClick={handleSendRequest} disabled={sending || !requestData.message.trim()} className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg flex items-center gap-2">
+                  <FiSend size={14} /> {sending ? 'Sending...' : 'Send Request'}
                 </button>
               </div>
             </div>

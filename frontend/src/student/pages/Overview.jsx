@@ -121,50 +121,50 @@ function Overview() {
         <p className="text-gray-600">Welcome to your student dashboard. Track your projects and stay updated.</p>
       </div>
       
-      {/* Stats Cards */}
+      {/* Stats Cards - Simple Design */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-6 text-white">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-3xl mb-2">📊</div>
-              <h3 className="text-sm font-semibold opacity-90">My Projects</h3>
-              <p className="text-3xl font-bold mt-1">{stats.totalProjects}</p>
+              <h3 className="text-sm font-semibold text-gray-500">My Projects</h3>
+              <p className="text-3xl font-bold text-gray-800 mt-1">{stats.totalProjects}</p>
             </div>
-            <FiBookOpen size={32} className="opacity-50" />
+            <FiBookOpen size={32} className="text-gray-400" />
           </div>
-          <p className="text-xs opacity-75 mt-2">{stats.approvedProjects} approved • {stats.pendingProposals} pending</p>
+          <p className="text-xs text-gray-500 mt-2">{stats.approvedProjects} approved • {stats.pendingProposals} pending</p>
         </div>
         
-        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-3xl mb-2">✅</div>
-              <h3 className="text-sm font-semibold opacity-90">Completed Tasks</h3>
-              <p className="text-3xl font-bold mt-1">{stats.completedTasks}</p>
+              <h3 className="text-sm font-semibold text-gray-500">Completed Tasks</h3>
+              <p className="text-3xl font-bold text-gray-800 mt-1">{stats.completedTasks}</p>
             </div>
-            <FiCheckCircle size={32} className="opacity-50" />
+            <FiCheckCircle size={32} className="text-gray-400" />
           </div>
         </div>
         
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl p-6 text-white">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-3xl mb-2">⏰</div>
-              <h3 className="text-sm font-semibold opacity-90">Pending Tasks</h3>
-              <p className="text-3xl font-bold mt-1">{stats.pendingTasks}</p>
+              <h3 className="text-sm font-semibold text-gray-500">Pending Tasks</h3>
+              <p className="text-3xl font-bold text-gray-800 mt-1">{stats.pendingTasks}</p>
             </div>
-            <FiClock size={32} className="opacity-50" />
+            <FiClock size={32} className="text-gray-400" />
           </div>
         </div>
         
-        <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-6 text-white">
+        <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-3xl mb-2">📋</div>
-              <h3 className="text-sm font-semibold opacity-90">Active Projects</h3>
-              <p className="text-3xl font-bold mt-1">{stats.approvedProjects}</p>
+              <h3 className="text-sm font-semibold text-gray-500">Active Projects</h3>
+              <p className="text-3xl font-bold text-gray-800 mt-1">{stats.approvedProjects}</p>
             </div>
-            <FiBookOpen size={32} className="opacity-50" />
+            <FiBookOpen size={32} className="text-gray-400" />
           </div>
         </div>
       </div>
@@ -172,9 +172,9 @@ function Overview() {
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Recent Proposals */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
           <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <FiBookOpen className="text-primary-500" /> Recent Proposals
+            <FiBookOpen className="text-gray-500" /> Recent Proposals
           </h3>
           {recentProposals.length > 0 ? (
             <div className="space-y-3">
@@ -204,7 +204,7 @@ function Overview() {
               <p>No proposals submitted yet</p>
               <button 
                 onClick={() => window.location.href = '/student#submit-proposal'}
-                className="mt-2 text-primary-600 hover:text-primary-700 text-sm"
+                className="mt-2 text-blue-600 hover:text-blue-700 text-sm"
               >
                 Submit your first proposal →
               </button>
@@ -213,9 +213,9 @@ function Overview() {
         </div>
 
         {/* Upcoming Deadlines */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
           <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <FiCalendar className="text-primary-500" /> Upcoming Deadlines
+            <FiCalendar className="text-gray-500" /> Upcoming Deadlines
           </h3>
           {upcomingDeadlines.length > 0 ? (
             <div className="space-y-3">
@@ -248,33 +248,33 @@ function Overview() {
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
         <h3 className="text-lg font-bold text-gray-800 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <button 
             onClick={() => window.location.href = '/student#submit-proposal'}
-            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-lg hover:shadow-lg transition-all flex items-center gap-3 justify-center"
+            className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg transition-all flex items-center gap-3 justify-center"
           >
             <span className="text-2xl">📝</span>
             <span className="font-semibold">Submit Proposal</span>
           </button>
           <button 
             onClick={() => window.location.href = '/student#upload-files'}
-            className="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-lg hover:shadow-lg transition-all flex items-center gap-3 justify-center"
+            className="bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg transition-all flex items-center gap-3 justify-center"
           >
             <span className="text-2xl">📁</span>
             <span className="font-semibold">Upload Files</span>
           </button>
           <button 
             onClick={() => window.location.href = '/student#supervisor'}
-            className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 rounded-lg hover:shadow-lg transition-all flex items-center gap-3 justify-center"
+            className="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg transition-all flex items-center gap-3 justify-center"
           >
             <span className="text-2xl">👨‍🏫</span>
             <span className="font-semibold">View Supervisor</span>
           </button>
           <button 
             onClick={() => window.location.href = '/student#notifications'}
-            className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 rounded-lg hover:shadow-lg transition-all flex items-center gap-3 justify-center"
+            className="bg-orange-600 hover:bg-orange-700 text-white p-4 rounded-lg transition-all flex items-center gap-3 justify-center"
           >
             <span className="text-2xl">🔔</span>
             <span className="font-semibold">Notifications</span>
