@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useToast } from '../../context/ToastContext'
 import axios from 'axios'
-import { FiMail, FiMessageSquare, FiUser, FiBookOpen, FiAlertCircle, FiChevronDown, FiChevronUp, FiSend, FiSearch, FiRefreshCw } from 'react-icons/fi'
+import { FiMail, FiMessageSquare, FiUser, FiBookOpen, FiSend, FiSearch, FiRefreshCw, FiUserCheck, FiUsers } from 'react-icons/fi'
 
 function Supervisor() {
   const { showSuccess, showError } = useToast()
@@ -12,8 +12,6 @@ function Supervisor() {
   const [allTeachers, setAllTeachers] = useState([])
   const [filteredTeachers, setFilteredTeachers] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
-  const [expandedCard, setExpandedCard] = useState(null)
-  const [expandedTeacherCard, setExpandedTeacherCard] = useState(null)
   const [selectedTeacher, setSelectedTeacher] = useState(null)
   const [showMessageModal, setShowMessageModal] = useState(false)
   const [showRequestModal, setShowRequestModal] = useState(false)
@@ -213,33 +211,6 @@ function Supervisor() {
     return types[type] || type
   }
 
-  const getProjectStatusColor = (status) => {
-    switch(status) {
-      case 'approved': return 'text-green-600'
-      case 'assigned': return 'text-blue-600'
-      case 'pending': return 'text-yellow-600'
-      case 'rejected': return 'text-red-600'
-      case 'revision': return 'text-orange-600'
-      default: return 'text-gray-600'
-    }
-  }
-
-  const toggleAssignedCard = (index) => {
-    if (expandedCard === index) {
-      setExpandedCard(null)
-    } else {
-      setExpandedCard(index)
-    }
-  }
-
-  const toggleTeacherCard = (index) => {
-    if (expandedTeacherCard === index) {
-      setExpandedTeacherCard(null)
-    } else {
-      setExpandedTeacherCard(index)
-    }
-  }
-
   const getStatusColor = (status) => {
     switch(status) {
       case 'approved': return 'bg-green-100 text-green-700'
@@ -259,190 +230,181 @@ function Supervisor() {
 
   return (
     <div>
-      <div className="mb-6 flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-800">Faculty & Supervisors</h2>
-          <p className="text-gray-600">View your assigned supervisors and browse all faculty members</p>
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-800">Faculty & Supervisors</h1>
+            <p className="text-gray-500 text-sm mt-1">Connect with your supervisors and faculty members</p>
+          </div>
+          <button
+            onClick={fetchData}
+            className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-xl flex items-center gap-2 transition-all"
+          >
+            <FiRefreshCw size={16} />
+            Refresh
+          </button>
         </div>
-        <button
-          onClick={fetchData}
-          className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all"
-        >
-          <FiRefreshCw size={18} />
-          Refresh
-        </button>
       </div>
 
-      {/* ============ SECTION 1: ASSIGNED SUPERVISORS ============ */}
+      {/* ============ SECTION 1: CURRENT SUPERVISORS ============ */}
       {assignedSupervisors.length > 0 && (
-        <div className="mb-8">
-          <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <span className="text-2xl">👨‍🏫</span> Your Assigned Supervisors
-          </h3>
-          <div className="space-y-4">
+        <div className="mb-10">
+          <div className="flex items-center gap-3 mb-5">
+            <div className="w-8 h-8 bg-blue-100 rounded-xl flex items-center justify-center">
+              <FiUserCheck className="text-blue-600" size={18} />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-800">Current Supervisors</h2>
+              <p className="text-xs text-gray-400">Your assigned project supervisors</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {assignedSupervisors.map((item, index) => (
-              <div key={index} className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-                <div 
-                  className="p-5 cursor-pointer hover:bg-gray-50 transition-colors"
-                  onClick={() => toggleAssignedCard(index)}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 flex-1">
-                      <div className="w-14 h-14 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-xl font-bold">
+              <div key={index} className="bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden">
+                <div className="p-5">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white text-xl font-bold shadow-sm">
                         {item.supervisor?.name?.charAt(0) || 'S'}
                       </div>
-                      <div className="flex-1">
-                        <h3 className="text-lg font-bold text-gray-800">{item.supervisor?.name}</h3>
-                        <p className="text-sm text-gray-500">ID: {item.supervisor?.id}</p>
-                        <p className="text-xs text-gray-400 mt-1">Project: {item.projectTitle?.substring(0, 50)}...</p>
+                      <div>
+                        <h3 className="font-bold text-gray-800 text-lg">{item.supervisor?.name}</h3>
+                        <p className="text-xs text-gray-500">Supervisor ID: {item.supervisor?.id}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${getStatusColor(item.projectStatus)}`}>
+                            {item.projectStatus?.toUpperCase()}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(item.projectStatus)}`}>
-                        {item.projectStatus?.toUpperCase()}
-                      </span>
-                      {expandedCard === index ? <FiChevronUp size={18} /> : <FiChevronDown size={18} />}
                     </div>
                   </div>
-                </div>
-                {expandedCard === index && (
-                  <div className="border-t border-gray-200 p-5 bg-gray-50">
-                    <div className="mb-4">
-                      <h4 className="font-semibold text-gray-700 mb-2">Project Details</h4>
-                      <div className="bg-white border border-gray-200 rounded-lg p-4">
-                        <p className="font-medium text-gray-800">{item.projectTitle}</p>
-                        <div className="grid grid-cols-2 gap-3 mt-3 text-sm">
-                          <div><span className="text-gray-500">Roll:</span> {item.rollNumber}</div>
-                          <div><span className="text-gray-500">Dept:</span> {item.department}</div>
-                          <div><span className="text-gray-500">Sem:</span> {item.semester}</div>
-                        </div>
+                  
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <div className="mb-3">
+                      <p className="text-xs text-gray-500 mb-1">Project</p>
+                      <p className="text-sm font-medium text-gray-800">{item.projectTitle}</p>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2 mb-4">
+                      <div>
+                        <p className="text-[10px] text-gray-400">Roll No</p>
+                        <p className="text-xs text-gray-700">{item.rollNumber}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-gray-400">Department</p>
+                        <p className="text-xs text-gray-700">{item.department}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-gray-400">Semester</p>
+                        <p className="text-xs text-gray-700">{item.semester}</p>
                       </div>
                     </div>
-                    <div className="mb-4">
-                      <h4 className="font-semibold text-gray-700 mb-2">Contact</h4>
-                      <div className="bg-white border border-gray-200 rounded-lg p-4">
-                        <div className="flex items-center gap-3">
-                          <FiMail className="text-gray-400" size={16} />
-                          <span className="text-sm text-gray-700">{item.supervisor?.email}</span>
-                        </div>
-                      </div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <FiMail className="text-gray-400" size={14} />
+                      <span className="text-xs text-gray-600 break-all">{item.supervisor?.email}</span>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="flex gap-3">
                       <button
                         onClick={() => openMessageModal(item.supervisor)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg flex items-center justify-center gap-2 transition-all"
+                        className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 py-2 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-all"
                       >
-                        <FiMessageSquare size={14} /> Send Message
+                        <FiMessageSquare size={14} /> Message
                       </button>
                       <button
                         onClick={() => openRequestModal(item.supervisor)}
-                        className="bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-lg flex items-center justify-center gap-2 transition-all"
+                        className="flex-1 bg-orange-50 hover:bg-orange-100 text-orange-700 py-2 rounded-xl flex items-center justify-center gap-2 text-sm font-medium transition-all"
                       >
-                        <FiSend size={14} /> Send Request
+                        <FiSend size={14} /> Request
                       </button>
                     </div>
                   </div>
-                )}
+                </div>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* ============ SECTION 2: ALL TEACHERS ============ */}
+      {/* ============ SECTION 2: ALL FACULTY MEMBERS ============ */}
       <div>
-        <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-          <span className="text-2xl">👨‍🏫</span> All Faculty Members
-        </h3>
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-8 h-8 bg-purple-100 rounded-xl flex items-center justify-center">
+            <FiUsers className="text-purple-600" size={18} />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-gray-800">All Faculty Members</h2>
+            <p className="text-xs text-gray-400">Browse and connect with faculty</p>
+          </div>
+        </div>
         
         {/* Search Bar */}
         <div className="mb-6">
           <div className="relative">
-            <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+            <FiSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
             <input
               type="text"
               placeholder="Search by name, department, or employee ID..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             />
           </div>
         </div>
 
-        {/* Stats Summary - Simple Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="bg-blue-600 text-white rounded-xl p-4">
-            <div className="text-2xl mb-1">👨‍🏫</div>
-            <div className="text-2xl font-bold">{allTeachers.length}</div>
-            <div className="text-sm opacity-90">Total Faculty</div>
-          </div>
-          <div className="bg-green-600 text-white rounded-xl p-4">
-            <div className="text-2xl mb-1">📚</div>
-            <div className="text-2xl font-bold">{allProposals.length}</div>
-            <div className="text-sm opacity-90">Your Proposals</div>
-          </div>
-        </div>
-
-        {/* All Teachers List - Square Cards */}
+        {/* Faculty Grid */}
         {filteredTeachers.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
-            <div className="text-6xl mb-4">👨‍🏫</div>
-            <h3 className="text-xl font-bold text-gray-800 mb-2">No Teachers Found</h3>
-            <p className="text-gray-600">
-              {searchTerm ? 'No teachers match your search criteria.' : 'No teachers available in the system.'}
+          <div className="bg-gray-50 rounded-2xl p-12 text-center">
+            <div className="text-5xl mb-3">👨‍🏫</div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-1">No Faculty Found</h3>
+            <p className="text-sm text-gray-500">
+              {searchTerm ? 'Try a different search term' : 'No faculty members available'}
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filteredTeachers.map((teacher, index) => (
-              <div key={teacher._id} className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all">
-                <div 
-                  className="p-5 cursor-pointer"
-                  onClick={() => toggleTeacherCard(index)}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 text-lg font-bold">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            {filteredTeachers.map((teacher) => (
+              <div key={teacher._id} className="bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden group">
+                <div className="p-5">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-gray-600 text-lg font-bold group-hover:bg-blue-50 transition-colors">
                       {teacher.name?.charAt(0) || 'T'}
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-gray-800">{teacher.name}</h3>
+                      <h3 className="font-semibold text-gray-800">{teacher.name}</h3>
                       <p className="text-xs text-gray-500">{teacher.employeeId}</p>
-                      <p className="text-xs text-gray-600 mt-1">{teacher.designation}</p>
+                      <p className="text-xs text-gray-600 mt-0.5">{teacher.designation}</p>
                     </div>
-                    <div>
-                      {expandedTeacherCard === index ? <FiChevronUp size={18} className="text-gray-400" /> : <FiChevronDown size={18} className="text-gray-400" />}
+                  </div>
+                  
+                  <div className="mb-3">
+                    <p className="text-[11px] text-gray-400 uppercase tracking-wider mb-1">Department</p>
+                    <p className="text-sm text-gray-700">{teacher.department}</p>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <p className="text-[11px] text-gray-400 uppercase tracking-wider mb-1">Email</p>
+                    <div className="flex items-center gap-2">
+                      <FiMail className="text-gray-400 flex-shrink-0" size={12} />
+                      <span className="text-xs text-gray-600 truncate">{teacher.email}</span>
                     </div>
+                  </div>
+                  
+                  <div className="flex gap-2 mt-4 pt-2">
+                    <button
+                      onClick={() => openMessageModal(teacher)}
+                      className="flex-1 bg-gray-50 hover:bg-blue-50 text-gray-700 hover:text-blue-700 py-2 rounded-xl flex items-center justify-center gap-2 text-sm transition-all"
+                    >
+                      <FiMessageSquare size={14} /> Message
+                    </button>
+                    <button
+                      onClick={() => openRequestModal(teacher)}
+                      className="flex-1 bg-gray-50 hover:bg-orange-50 text-gray-700 hover:text-orange-700 py-2 rounded-xl flex items-center justify-center gap-2 text-sm transition-all"
+                    >
+                      <FiSend size={14} /> Request
+                    </button>
                   </div>
                 </div>
-                {expandedTeacherCard === index && (
-                  <div className="border-t border-gray-200 p-4 bg-gray-50">
-                    <div className="mb-3">
-                      <p className="text-xs text-gray-500 mb-1">Department</p>
-                      <p className="text-sm text-gray-700">{teacher.department}</p>
-                    </div>
-                    <div className="mb-3">
-                      <p className="text-xs text-gray-500 mb-1">Email</p>
-                      <div className="flex items-center gap-2">
-                        <FiMail className="text-gray-400" size={14} />
-                        <span className="text-sm text-gray-700 break-all">{teacher.email}</span>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 mt-3">
-                      <button
-                        onClick={() => openMessageModal(teacher)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg flex items-center justify-center gap-2 text-sm transition-all"
-                      >
-                        <FiMessageSquare size={14} /> Message
-                      </button>
-                      <button
-                        onClick={() => openRequestModal(teacher)}
-                        className="bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-lg flex items-center justify-center gap-2 text-sm transition-all"
-                      >
-                        <FiSend size={14} /> Request
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
             ))}
           </div>
@@ -451,22 +413,27 @@ function Supervisor() {
 
       {/* Message Modal */}
       {showMessageModal && selectedTeacher && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-            <div className="flex justify-between items-center p-5 border-b border-gray-200">
-              <h3 className="text-lg font-bold text-gray-800">Send Message to {selectedTeacher.name}</h3>
-              <button onClick={() => setShowMessageModal(false)} className="text-gray-400 hover:text-gray-600">✕</button>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in duration-200">
+            <div className="flex justify-between items-center p-5 border-b border-gray-100">
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">Send Message</h3>
+                <p className="text-xs text-gray-500 mt-0.5">to {selectedTeacher.name}</p>
+              </div>
+              <button onClick={() => setShowMessageModal(false)} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-all">
+                ✕
+              </button>
             </div>
             <div className="p-5">
-              <div className="bg-gray-50 p-3 rounded-lg mb-4">
+              <div className="bg-gray-50 rounded-xl p-3 mb-4">
                 <p className="text-xs text-gray-500 mb-1">To:</p>
-                <p className="font-medium text-gray-800">{selectedTeacher.name}</p>
-                <p className="text-xs text-gray-500">{selectedTeacher.email}</p>
+                <p className="font-medium text-gray-800 text-sm">{selectedTeacher.name}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{selectedTeacher.email}</p>
               </div>
               
               {/* Project Selection Dropdown */}
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Related Project (Optional)
                 </label>
                 <select
@@ -475,7 +442,7 @@ function Supervisor() {
                     const project = allProposals.find(p => p._id === e.target.value)
                     setSelectedProject(project || null)
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 >
                   <option value="">-- No specific project --</option>
                   {allProposals.map((project) => (
@@ -490,12 +457,12 @@ function Supervisor() {
                 value={messageText}
                 onChange={(e) => setMessageText(e.target.value)}
                 rows="4"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"
                 placeholder={`Type your message to ${selectedTeacher.name}...`}
               />
               <div className="flex justify-end gap-3 mt-5">
-                <button onClick={() => setShowMessageModal(false)} className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
-                <button onClick={handleSendMessage} disabled={sending || !messageText.trim()} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2">
+                <button onClick={() => setShowMessageModal(false)} className="px-4 py-2 text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all text-sm">Cancel</button>
+                <button onClick={handleSendMessage} disabled={sending || !messageText.trim()} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl flex items-center gap-2 transition-all text-sm disabled:opacity-50">
                   <FiSend size={14} /> {sending ? 'Sending...' : 'Send Message'}
                 </button>
               </div>
@@ -506,22 +473,27 @@ function Supervisor() {
 
       {/* Request Modal */}
       {showRequestModal && selectedTeacher && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-            <div className="flex justify-between items-center p-5 border-b border-gray-200">
-              <h3 className="text-lg font-bold text-gray-800">Send Request to {selectedTeacher.name}</h3>
-              <button onClick={() => setShowRequestModal(false)} className="text-gray-400 hover:text-gray-600">✕</button>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md animate-in fade-in zoom-in duration-200">
+            <div className="flex justify-between items-center p-5 border-b border-gray-100">
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">Send Request</h3>
+                <p className="text-xs text-gray-500 mt-0.5">to {selectedTeacher.name}</p>
+              </div>
+              <button onClick={() => setShowRequestModal(false)} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-all">
+                ✕
+              </button>
             </div>
             <div className="p-5">
-              <div className="bg-gray-50 p-3 rounded-lg mb-4">
+              <div className="bg-gray-50 rounded-xl p-3 mb-4">
                 <p className="text-xs text-gray-500 mb-1">To:</p>
-                <p className="font-medium text-gray-800">{selectedTeacher.name}</p>
-                <p className="text-xs text-gray-500">{selectedTeacher.email}</p>
+                <p className="font-medium text-gray-800 text-sm">{selectedTeacher.name}</p>
+                <p className="text-xs text-gray-500 mt-0.5">{selectedTeacher.email}</p>
               </div>
               
               {/* Project Selection Dropdown */}
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Related Project (Optional)
                 </label>
                 <select
@@ -530,7 +502,7 @@ function Supervisor() {
                     const project = allProposals.find(p => p._id === e.target.value)
                     setSelectedProject(project || null)
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 >
                   <option value="">-- No specific project --</option>
                   {allProposals.map((project) => (
@@ -543,13 +515,13 @@ function Supervisor() {
 
               {/* Request Type Selection */}
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Request Type *
                 </label>
                 <select
                   value={requestData.requestType}
                   onChange={(e) => setRequestData({ ...requestData, requestType: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                 >
                   <option value="meeting">📅 Meeting Request</option>
                   <option value="extension">⏰ Extension Request</option>
@@ -561,21 +533,21 @@ function Supervisor() {
 
               {/* Request Message */}
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Request Details *
                 </label>
                 <textarea
                   value={requestData.message}
                   onChange={(e) => setRequestData({ ...requestData, message: e.target.value })}
                   rows="4"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none"
                   placeholder="Please describe your request in detail..."
                 />
               </div>
 
               <div className="flex justify-end gap-3 mt-5">
-                <button onClick={() => setShowRequestModal(false)} className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200">Cancel</button>
-                <button onClick={handleSendRequest} disabled={sending || !requestData.message.trim()} className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-lg flex items-center gap-2">
+                <button onClick={() => setShowRequestModal(false)} className="px-4 py-2 text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all text-sm">Cancel</button>
+                <button onClick={handleSendRequest} disabled={sending || !requestData.message.trim()} className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-xl flex items-center gap-2 transition-all text-sm disabled:opacity-50">
                   <FiSend size={14} /> {sending ? 'Sending...' : 'Send Request'}
                 </button>
               </div>
@@ -583,13 +555,6 @@ function Supervisor() {
           </div>
         </div>
       )}
-
-      {/* Footer Note */}
-      <div className="mt-6 bg-gray-50 rounded-lg p-4">
-        <p className="text-sm text-gray-600 text-center">
-          📍 Send messages or formal requests to any faculty member. You can associate your request with any of your projects.
-        </p>
-      </div>
     </div>
   )
 }
