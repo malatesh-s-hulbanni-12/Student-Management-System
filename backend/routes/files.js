@@ -236,4 +236,19 @@ router.delete('/:id', authenticateToken, async (req, res) => {
   }
 })
 
+// Get all files for admin (admin view)
+router.get('/all-files', authenticateToken, async (req, res) => {
+  try {
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ success: false, message: 'Admin access required' })
+    }
+
+    const files = await File.find().sort({ createdAt: -1 })
+    res.json({ success: true, files })
+  } catch (error) {
+    console.error('Error fetching all files:', error)
+    res.status(500).json({ success: false, message: error.message })
+  }
+})
+
 export default router

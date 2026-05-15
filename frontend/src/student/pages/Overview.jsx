@@ -1,7 +1,20 @@
 import React, { useState, useEffect } from 'react'
 import { useToast } from '../../context/ToastContext'
 import axiosInstance from '../../services/axiosConfig'
-import { FiBookOpen, FiCheckCircle, FiClock, FiUser, FiCalendar, FiAlertCircle } from 'react-icons/fi'
+import { 
+  FiBookOpen, 
+  FiCheckCircle, 
+  FiClock, 
+  FiCalendar, 
+  FiAlertCircle,
+  FiFileText,
+  FiUpload,
+  FiUserCheck,
+  FiBell,
+  FiBarChart2,
+  FiList,
+  FiTarget
+} from 'react-icons/fi'
 
 function Overview() {
   const { showError } = useToast()
@@ -19,16 +32,13 @@ function Overview() {
   // Fetch student data
   const fetchStudentData = async () => {
     try {
-      // Fetch student's proposals
       const proposalsRes = await axiosInstance.get('/proposals/my-proposals')
       const proposals = proposalsRes.data.proposals || []
       
-      // Calculate stats
       const totalProjects = proposals.length
       const approvedProjects = proposals.filter(p => p.status === 'approved' || p.status === 'assigned').length
       const pendingProposals = proposals.filter(p => p.status === 'pending').length
       
-      // Calculate tasks (based on deadlines)
       let completedTasks = 0
       let pendingTasks = 0
       const allDeadlines = []
@@ -58,7 +68,6 @@ function Overview() {
         pendingProposals
       })
       
-      // Get recent proposals (last 3)
       const recent = proposals.slice(0, 3).map(p => ({
         title: p.projectTitle,
         status: p.status,
@@ -67,7 +76,6 @@ function Overview() {
       }))
       setRecentProposals(recent)
       
-      // Get upcoming deadlines (pending and future dates)
       const now = new Date()
       const upcoming = allDeadlines
         .filter(d => d.status !== 'completed' && new Date(d.dueDate) > now)
@@ -121,16 +129,16 @@ function Overview() {
         <p className="text-gray-600">Welcome to your student dashboard. Track your projects and stay updated.</p>
       </div>
       
-      {/* Stats Cards - Simple Design */}
+      {/* Stats Cards - Simple Design with React Icons */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-3xl mb-2">📊</div>
+              <FiBarChart2 className="text-3xl text-blue-500 mb-2" />
               <h3 className="text-sm font-semibold text-gray-500">My Projects</h3>
               <p className="text-3xl font-bold text-gray-800 mt-1">{stats.totalProjects}</p>
             </div>
-            <FiBookOpen size={32} className="text-gray-400" />
+            <FiBookOpen size={32} className="text-gray-300" />
           </div>
           <p className="text-xs text-gray-500 mt-2">{stats.approvedProjects} approved • {stats.pendingProposals} pending</p>
         </div>
@@ -138,33 +146,33 @@ function Overview() {
         <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-3xl mb-2">✅</div>
+              <FiCheckCircle className="text-3xl text-green-500 mb-2" />
               <h3 className="text-sm font-semibold text-gray-500">Completed Tasks</h3>
               <p className="text-3xl font-bold text-gray-800 mt-1">{stats.completedTasks}</p>
             </div>
-            <FiCheckCircle size={32} className="text-gray-400" />
+            <FiCheckCircle size={32} className="text-gray-300" />
           </div>
         </div>
         
         <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-3xl mb-2">⏰</div>
+              <FiClock className="text-3xl text-orange-500 mb-2" />
               <h3 className="text-sm font-semibold text-gray-500">Pending Tasks</h3>
               <p className="text-3xl font-bold text-gray-800 mt-1">{stats.pendingTasks}</p>
             </div>
-            <FiClock size={32} className="text-gray-400" />
+            <FiClock size={32} className="text-gray-300" />
           </div>
         </div>
         
         <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-3xl mb-2">📋</div>
+              <FiTarget className="text-3xl text-purple-500 mb-2" />
               <h3 className="text-sm font-semibold text-gray-500">Active Projects</h3>
               <p className="text-3xl font-bold text-gray-800 mt-1">{stats.approvedProjects}</p>
             </div>
-            <FiBookOpen size={32} className="text-gray-400" />
+            <FiBookOpen size={32} className="text-gray-300" />
           </div>
         </div>
       </div>
@@ -174,7 +182,7 @@ function Overview() {
         {/* Recent Proposals */}
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
           <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <FiBookOpen className="text-gray-500" /> Recent Proposals
+            <FiList className="text-blue-500" size={18} /> Recent Proposals
           </h3>
           {recentProposals.length > 0 ? (
             <div className="space-y-3">
@@ -187,12 +195,14 @@ function Overview() {
                         <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${getStatusBadge(proposal.status)}`}>
                           {proposal.status.toUpperCase()}
                         </span>
-                        <span className="text-xs text-gray-400">
-                          {formatDate(proposal.submittedAt)}
+                        <span className="text-xs text-gray-400 flex items-center gap-1">
+                          <FiCalendar size={10} /> {formatDate(proposal.submittedAt)}
                         </span>
                       </div>
                       {proposal.feedback && (
-                        <p className="text-xs text-gray-500 mt-2">Feedback: {proposal.feedback}</p>
+                        <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                          <FiAlertCircle size={10} /> Feedback: {proposal.feedback}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -201,6 +211,7 @@ function Overview() {
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500">
+              <FiFileText className="text-4xl text-gray-300 mx-auto mb-2" />
               <p>No proposals submitted yet</p>
               <button 
                 onClick={() => window.location.href = '/student#submit-proposal'}
@@ -215,7 +226,7 @@ function Overview() {
         {/* Upcoming Deadlines */}
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
           <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <FiCalendar className="text-gray-500" /> Upcoming Deadlines
+            <FiCalendar className="text-orange-500" size={18} /> Upcoming Deadlines
           </h3>
           {upcomingDeadlines.length > 0 ? (
             <div className="space-y-3">
@@ -225,13 +236,13 @@ function Overview() {
                     <div className="flex-1">
                       <p className="font-medium text-gray-800">{deadline.projectTitle}</p>
                       <div className="flex items-center gap-3 mt-1">
-                        <span className="text-xs text-red-600 font-medium">
-                          Due: {formatDate(deadline.dueDate)}
+                        <span className="text-xs text-red-600 font-medium flex items-center gap-1">
+                          <FiCalendar size={10} /> Due: {formatDate(deadline.dueDate)}
                         </span>
                       </div>
                     </div>
-                    <span className="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700">
-                      Pending
+                    <span className="px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700 flex items-center gap-1">
+                      <FiClock size={10} /> Pending
                     </span>
                   </div>
                 </div>
@@ -239,7 +250,7 @@ function Overview() {
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500">
-              <FiCalendar className="mx-auto text-3xl mb-2 opacity-50" />
+              <FiCalendar className="text-4xl text-gray-300 mx-auto mb-2" />
               <p>No upcoming deadlines</p>
               <p className="text-xs mt-1">Your deadlines will appear here once assigned</p>
             </div>
@@ -253,30 +264,30 @@ function Overview() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <button 
             onClick={() => window.location.href = '/student#submit-proposal'}
-            className="bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg transition-all flex items-center gap-3 justify-center"
+            className="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
           >
-            <span className="text-2xl">📝</span>
+            <FiFileText size={18} />
             <span className="font-semibold">Submit Proposal</span>
           </button>
           <button 
             onClick={() => window.location.href = '/student#upload-files'}
-            className="bg-green-600 hover:bg-green-700 text-white p-4 rounded-lg transition-all flex items-center gap-3 justify-center"
+            className="bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
           >
-            <span className="text-2xl">📁</span>
+            <FiUpload size={18} />
             <span className="font-semibold">Upload Files</span>
           </button>
           <button 
             onClick={() => window.location.href = '/student#supervisor'}
-            className="bg-purple-600 hover:bg-purple-700 text-white p-4 rounded-lg transition-all flex items-center gap-3 justify-center"
+            className="bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
           >
-            <span className="text-2xl">👨‍🏫</span>
+            <FiUserCheck size={18} />
             <span className="font-semibold">View Supervisor</span>
           </button>
           <button 
             onClick={() => window.location.href = '/student#notifications'}
-            className="bg-orange-600 hover:bg-orange-700 text-white p-4 rounded-lg transition-all flex items-center gap-3 justify-center"
+            className="bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-xl flex items-center justify-center gap-2 transition-all"
           >
-            <span className="text-2xl">🔔</span>
+            <FiBell size={18} />
             <span className="font-semibold">Notifications</span>
           </button>
         </div>

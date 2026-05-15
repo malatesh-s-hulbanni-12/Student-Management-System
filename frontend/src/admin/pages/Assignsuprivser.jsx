@@ -1,7 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { useToast } from '../../context/ToastContext'
 import axiosInstance from '../../services/axiosConfig'
-import { FiUserCheck, FiRefreshCw, FiUserPlus, FiX, FiCheckCircle, FiClock, FiEdit2 } from 'react-icons/fi'
+import { 
+  FiUserCheck, 
+  FiRefreshCw, 
+  FiUserPlus, 
+  FiX, 
+  FiCheckCircle, 
+  FiClock, 
+  FiEdit2,
+  FiUsers,
+  FiBookOpen,
+  FiUser
+} from 'react-icons/fi'
 
 function AssignSupervisor() {
   const { showSuccess, showError } = useToast()
@@ -15,6 +26,7 @@ function AssignSupervisor() {
   const [selectedTeacher, setSelectedTeacher] = useState('')
   const [assigning, setAssigning] = useState(false)
   const [activeTab, setActiveTab] = useState('pending')
+  const [isRefreshing, setIsRefreshing] = useState(false)
 
   // Fetch approved projects (status: approved)
   const fetchApprovedProjects = async () => {
@@ -52,6 +64,12 @@ function AssignSupervisor() {
       console.error('Error fetching teachers:', error)
       showError('Failed to fetch teachers')
     }
+  }
+
+  const refreshAll = async () => {
+    setIsRefreshing(true)
+    await Promise.all([fetchApprovedProjects(), fetchAssignedProjects(), fetchTeachers()])
+    setTimeout(() => setIsRefreshing(false), 500)
   }
 
   useEffect(() => {
@@ -101,7 +119,7 @@ function AssignSupervisor() {
       if (response.data.success) {
         showSuccess(`Supervisor ${teacher.name} assigned to ${selectedProject.studentName}'s project!`)
         setShowAssignModal(false)
-        await Promise.all([fetchApprovedProjects(), fetchAssignedProjects()])
+        await refreshAll()
       }
     } catch (error) {
       console.error('Error assigning supervisor:', error)
@@ -135,7 +153,7 @@ function AssignSupervisor() {
       if (response.data.success) {
         showSuccess(`Supervisor changed to ${teacher.name} for ${selectedProject.studentName}'s project!`)
         setShowChangeModal(false)
-        await Promise.all([fetchApprovedProjects(), fetchAssignedProjects()])
+        await refreshAll()
       }
     } catch (error) {
       console.error('Error changing supervisor:', error)
@@ -166,50 +184,51 @@ function AssignSupervisor() {
 
   return (
     <div>
-      {/* Header */}
-      <div className="mb-6 flex justify-between items-center">
+      {/* Header with Refresh Button */}
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Assign Supervisor</h2>
           <p className="text-gray-600">Assign or change supervisors for projects</p>
         </div>
         <button
-          onClick={() => {
-            fetchApprovedProjects()
-            fetchAssignedProjects()
-          }}
-          className="bg-gray-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-gray-600 transition-all"
+          onClick={refreshAll}
+          disabled={isRefreshing}
+          className="flex items-center gap-2 px-4 py-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-all disabled:opacity-50"
         >
-          <FiRefreshCw size={18} />
+          <FiRefreshCw 
+            size={16} 
+            className={`${isRefreshing ? 'animate-spin text-blue-500' : 'text-gray-500'}`} 
+          />
           Refresh
         </button>
       </div>
 
-      {/* Stats Summary */}
+      {/* Stats Summary with React Icons */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-xl p-4 text-white">
-          <div className="text-2xl mb-1">⏳</div>
-          <div className="text-2xl font-bold">{approvedProjects.length}</div>
-          <div className="text-sm opacity-90">Awaiting Assignment</div>
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+          <FiClock className="text-2xl text-yellow-500 mb-1" />
+          <div className="text-xl font-bold text-gray-800">{approvedProjects.length}</div>
+          <div className="text-xs text-gray-500">Awaiting Assignment</div>
         </div>
-        <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-4 text-white">
-          <div className="text-2xl mb-1">✅</div>
-          <div className="text-2xl font-bold">{assignedProjects.length}</div>
-          <div className="text-sm opacity-90">Assigned Projects</div>
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+          <FiCheckCircle className="text-2xl text-green-500 mb-1" />
+          <div className="text-xl font-bold text-gray-800">{assignedProjects.length}</div>
+          <div className="text-xs text-gray-500">Assigned Projects</div>
         </div>
-        <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl p-4 text-white">
-          <div className="text-2xl mb-1">👨‍🏫</div>
-          <div className="text-2xl font-bold">{teachers.length}</div>
-          <div className="text-sm opacity-90">Available Supervisors</div>
+        <div className="bg-white border border-gray-200 rounded-xl p-4 shadow-sm">
+          <FiUsers className="text-2xl text-blue-500 mb-1" />
+          <div className="text-xl font-bold text-gray-800">{teachers.length}</div>
+          <div className="text-xs text-gray-500">Available Supervisors</div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 border-b border-gray-200">
+      <div className="flex gap-6 mb-6 border-b border-gray-200">
         <button
           onClick={() => setActiveTab('pending')}
-          className={`px-6 py-3 font-medium transition-all ${
+          className={`pb-3 px-1 font-medium text-sm transition-all ${
             activeTab === 'pending'
-              ? 'text-primary-600 border-b-2 border-primary-600'
+              ? 'text-blue-600 border-b-2 border-blue-600'
               : 'text-gray-500 hover:text-gray-700'
           }`}
         >
@@ -220,9 +239,9 @@ function AssignSupervisor() {
         </button>
         <button
           onClick={() => setActiveTab('assigned')}
-          className={`px-6 py-3 font-medium transition-all ${
+          className={`pb-3 px-1 font-medium text-sm transition-all ${
             activeTab === 'assigned'
-              ? 'text-primary-600 border-b-2 border-primary-600'
+              ? 'text-blue-600 border-b-2 border-blue-600'
               : 'text-gray-500 hover:text-gray-700'
           }`}
         >
@@ -238,7 +257,7 @@ function AssignSupervisor() {
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Roll No</th>
@@ -248,7 +267,7 @@ function AssignSupervisor() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-100">
                 {approvedProjects.length === 0 ? (
                   <tr>
                     <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
@@ -260,7 +279,7 @@ function AssignSupervisor() {
                     <tr key={project._id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-semibold">
+                          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 font-semibold text-sm">
                             {project.studentName?.charAt(0) || 'S'}
                           </div>
                           <span className="text-sm font-medium text-gray-900">{project.studentName}</span>
@@ -283,13 +302,13 @@ function AssignSupervisor() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <button
                           onClick={() => openAssignModal(project)}
-                          className="bg-gradient-to-r from-primary-500 to-secondary-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:shadow-lg transition-all"
+                          className="flex items-center gap-1 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-all"
                         >
-                          <FiUserPlus size={16} />
-                          Assign Supervisor
+                          <FiUserPlus size={14} />
+                          Assign
                         </button>
                        </td>
-                    </tr>
+                     </tr>
                   ))
                 )}
               </tbody>
@@ -303,17 +322,17 @@ function AssignSupervisor() {
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Roll No</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Project Title</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assigned Supervisor</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Supervisor</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-gray-100">
                 {assignedProjects.length === 0 ? (
                   <tr>
                     <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
@@ -325,7 +344,7 @@ function AssignSupervisor() {
                     <tr key={project._id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center text-primary-600 font-semibold">
+                          <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 font-semibold text-sm">
                             {project.studentName?.charAt(0) || 'S'}
                           </div>
                           <span className="text-sm font-medium text-gray-900">{project.studentName}</span>
@@ -356,13 +375,13 @@ function AssignSupervisor() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <button
                           onClick={() => openChangeModal(project)}
-                          className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-all"
+                          className="flex items-center gap-1 px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm transition-all"
                         >
-                          <FiEdit2 size={16} />
-                          Change Supervisor
+                          <FiEdit2 size={14} />
+                          Change
                         </button>
                        </td>
-                    </tr>
+                     </tr>
                   ))
                 )}
               </tbody>
@@ -373,33 +392,35 @@ function AssignSupervisor() {
 
       {/* Assign Supervisor Modal */}
       {showAssignModal && selectedProject && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-            <div className="flex justify-between items-center p-6 border-b border-gray-200">
-              <h3 className="text-xl font-bold text-gray-800">Assign Supervisor</h3>
-              <button onClick={() => setShowAssignModal(false)} className="text-gray-400 hover:text-gray-600">
-                <FiX size={24} />
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="flex justify-between items-center p-5 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-800">Assign Supervisor</h3>
+              <button onClick={() => setShowAssignModal(false)} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-all">
+                <FiX size={20} />
               </button>
             </div>
 
-            <div className="p-6">
+            <div className="p-5">
               {/* Project Info */}
-              <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                <p className="text-sm text-gray-500">Project Details</p>
+              <div className="bg-gray-50 rounded-xl p-4 mb-4">
+                <p className="text-xs text-gray-500 mb-1">Project Details</p>
                 <p className="font-semibold text-gray-800">{selectedProject.projectTitle}</p>
-                <p className="text-sm text-gray-600 mt-1">Student: {selectedProject.studentName}</p>
-                <p className="text-sm text-gray-600">Department: {selectedProject.department}</p>
+                <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                  <span className="flex items-center gap-1"><FiUser size={12} /> {selectedProject.studentName}</span>
+                  <span><FiBookOpen size={12} /> {selectedProject.department}</span>
+                </div>
               </div>
 
               {/* Select Supervisor */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Select Supervisor *
                 </label>
                 <select
                   value={selectedTeacher}
                   onChange={(e) => setSelectedTeacher(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                   required
                 >
                   <option value="">-- Select a supervisor --</option>
@@ -411,24 +432,23 @@ function AssignSupervisor() {
                 </select>
               </div>
 
-              {/* Available Supervisors Count */}
-              <div className="mt-4 text-sm text-gray-500">
+              <div className="mt-3 text-xs text-gray-400">
                 {teachers.length} supervisors available
               </div>
 
-              <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+              <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
                 <button
                   onClick={() => setShowAssignModal(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="px-4 py-2 text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleAssign}
                   disabled={assigning || !selectedTeacher}
-                  className="px-4 py-2 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg flex items-center gap-2 hover:shadow-lg transition-all disabled:opacity-50"
+                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl flex items-center gap-2 transition-all text-sm disabled:opacity-50"
                 >
-                  <FiUserCheck size={16} />
+                  <FiUserCheck size={14} />
                   {assigning ? 'Assigning...' : 'Assign Supervisor'}
                 </button>
               </div>
@@ -439,33 +459,36 @@ function AssignSupervisor() {
 
       {/* Change Supervisor Modal */}
       {showChangeModal && selectedProject && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-            <div className="flex justify-between items-center p-6 border-b border-gray-200">
-              <h3 className="text-xl font-bold text-gray-800">Change Supervisor</h3>
-              <button onClick={() => setShowChangeModal(false)} className="text-gray-400 hover:text-gray-600">
-                <FiX size={24} />
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+            <div className="flex justify-between items-center p-5 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-800">Change Supervisor</h3>
+              <button onClick={() => setShowChangeModal(false)} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition-all">
+                <FiX size={20} />
               </button>
             </div>
 
-            <div className="p-6">
+            <div className="p-5">
               {/* Project Info */}
-              <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                <p className="text-sm text-gray-500">Project Details</p>
+              <div className="bg-gray-50 rounded-xl p-4 mb-4">
+                <p className="text-xs text-gray-500 mb-1">Project Details</p>
                 <p className="font-semibold text-gray-800">{selectedProject.projectTitle}</p>
-                <p className="text-sm text-gray-600 mt-1">Student: {selectedProject.studentName}</p>
-                <p className="text-sm text-gray-600">Current Supervisor: <span className="font-semibold">{selectedProject.assignedSupervisor?.name}</span></p>
+                <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                  <span className="flex items-center gap-1"><FiUser size={12} /> {selectedProject.studentName}</span>
+                  <span><FiBookOpen size={12} /> {selectedProject.department}</span>
+                </div>
+                <p className="text-xs text-gray-600 mt-2">Current: <span className="font-semibold">{selectedProject.assignedSupervisor?.name}</span></p>
               </div>
 
               {/* Select New Supervisor */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Select New Supervisor *
                 </label>
                 <select
                   value={selectedTeacher}
                   onChange={(e) => setSelectedTeacher(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full px-3 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                   required
                 >
                   <option value="">-- Select a supervisor --</option>
@@ -477,24 +500,23 @@ function AssignSupervisor() {
                 </select>
               </div>
 
-              {/* Available Supervisors Count */}
-              <div className="mt-4 text-sm text-gray-500">
+              <div className="mt-3 text-xs text-gray-400">
                 {teachers.length} supervisors available
               </div>
 
-              <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+              <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
                 <button
                   onClick={() => setShowChangeModal(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="px-4 py-2 text-gray-600 bg-gray-100 rounded-xl hover:bg-gray-200 transition-all text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleChangeSupervisor}
                   disabled={assigning || !selectedTeacher}
-                  className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg flex items-center gap-2 transition-all disabled:opacity-50"
+                  className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-xl flex items-center gap-2 transition-all text-sm disabled:opacity-50"
                 >
-                  <FiEdit2 size={16} />
+                  <FiEdit2 size={14} />
                   {assigning ? 'Changing...' : 'Change Supervisor'}
                 </button>
               </div>

@@ -3,7 +3,8 @@ import AdminSidebar from './AdminSidebar'
 import AdminNavbar from './AdminNavbar'
 
 function AdminLayout({ children, user, onLogout, activeTab, onTabChange }) {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
+  // Sidebar closed by default - false means closed
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen)

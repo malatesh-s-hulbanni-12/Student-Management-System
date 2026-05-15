@@ -1,7 +1,23 @@
 import React, { useState, useEffect } from 'react'
 import { useToast } from '../../context/ToastContext'
 import axiosInstance from '../../services/axiosConfig'
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts'
+import { 
+  PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, 
+  BarChart, Bar, XAxis, YAxis, CartesianGrid 
+} from 'recharts'
+import { 
+  FiUsers, 
+  FiUserCheck, 
+  FiClock, 
+  FiTrendingUp,
+  FiUserPlus, 
+  FiUser, 
+  FiBookOpen, 
+  FiBarChart2,
+  FiActivity,
+  FiEye,
+  FiZap
+} from 'react-icons/fi'
 
 function Overview() {
   const { showError } = useToast()
@@ -19,7 +35,6 @@ function Overview() {
   // Fetch dashboard data
   const fetchDashboardData = async () => {
     try {
-      // Fetch students count
       const studentsRes = await axiosInstance.get('/students')
       const teachersRes = await axiosInstance.get('/teachers')
       const proposalsRes = await axiosInstance.get('/proposals/all')
@@ -28,7 +43,6 @@ function Overview() {
       const teachers = teachersRes.data.teachers || []
       const proposals = proposalsRes.data.proposals || []
       
-      // Calculate stats
       const totalStudents = students.length
       const totalTeachers = teachers.length
       const pendingRequests = proposals.filter(p => p.status === 'pending').length
@@ -61,7 +75,6 @@ function Overview() {
         { name: 'No supervisors assigned', value: 1, color: '#9ca3af' }
       ])
       
-      // Bar chart data
       const barChartData = Array.from(supervisorMap.entries()).map(([name, projects]) => ({
         name: name.length > 15 ? name.substring(0, 15) + '...' : name,
         projects: projects
@@ -71,12 +84,10 @@ function Overview() {
         { name: 'No data', projects: 0 }
       ])
       
-      // Fetch recent activities (requests and proposals)
       try {
         const requestsRes = await axiosInstance.get('/requests/teacher-requests')
         const recentActivities = []
         
-        // Add recent requests
         if (requestsRes.data.success && requestsRes.data.requests) {
           requestsRes.data.requests.slice(0, 5).forEach(req => {
             recentActivities.push({
@@ -90,7 +101,6 @@ function Overview() {
           })
         }
         
-        // Add recent proposals
         proposals.slice(0, 5).forEach(proposal => {
           recentActivities.push({
             student: proposal.studentName,
@@ -102,7 +112,6 @@ function Overview() {
           })
         })
         
-        // Sort by time and get latest 5
         recentActivities.sort((a, b) => new Date(b.time) - new Date(a.time))
         setActivities(recentActivities.slice(0, 5))
         
@@ -150,10 +159,10 @@ function Overview() {
   }
 
   const statsCards = [
-    { icon: '👨‍🎓', label: 'Total Students', value: stats.totalStudents, color: 'from-blue-500 to-blue-600' },
-    { icon: '👨‍🏫', label: 'Total Teachers', value: stats.totalTeachers, color: 'from-green-500 to-green-600' },
-    { icon: '⏳', label: 'Pending Requests', value: stats.pendingRequests, color: 'from-yellow-500 to-yellow-600' },
-    { icon: '🚀', label: 'Active Projects', value: stats.activeProjects, color: 'from-purple-500 to-purple-600' },
+    { icon: FiUsers, label: 'Total Students', value: stats.totalStudents, color: 'from-blue-500 to-blue-600' },
+    { icon: FiUserCheck, label: 'Total Teachers', value: stats.totalTeachers, color: 'from-green-500 to-green-600' },
+    { icon: FiClock, label: 'Pending Requests', value: stats.pendingRequests, color: 'from-yellow-500 to-yellow-600' },
+    { icon: FiZap, label: 'Active Projects', value: stats.activeProjects, color: 'from-purple-500 to-purple-600' },
   ]
 
   return (
@@ -164,17 +173,17 @@ function Overview() {
         <p className="text-gray-600">Manage the entire project management system and oversee all activities.</p>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards with React Icons */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {statsCards.map((stat, index) => (
-          <div key={index} className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden">
+          <div key={index} className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
             <div className={`bg-gradient-to-r ${stat.color} p-5`}>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-white text-sm opacity-90 mb-1">{stat.label}</p>
                   <p className="text-white text-3xl font-bold">{stat.value}</p>
                 </div>
-                <div className="text-4xl">{stat.icon}</div>
+                <stat.icon className="text-4xl text-white/80" />
               </div>
             </div>
           </div>
@@ -184,8 +193,11 @@ function Overview() {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         {/* Pie Chart - Project Distribution */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Project Distribution by Supervisor</h3>
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <FiBarChart2 className="text-blue-500" size={18} />
+            Project Distribution by Supervisor
+          </h3>
           {pieData.length > 0 && pieData[0].name !== 'No supervisors assigned' ? (
             <>
               <div className="h-80">
@@ -212,12 +224,12 @@ function Overview() {
               </div>
               <div className="mt-4 space-y-2">
                 {pieData.map((item, index) => (
-                  <div key={index} className="flex justify-between items-center p-2 hover:bg-gray-50 rounded-lg">
+                  <div key={index} className="flex justify-between items-center p-2 hover:bg-gray-50 rounded-lg transition-all">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
-                      <span className="text-gray-700">{item.name}</span>
+                      <span className="text-gray-700 text-sm">{item.name}</span>
                     </div>
-                    <span className="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-sm font-semibold">
+                    <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-semibold">
                       {item.value} Projects
                     </span>
                   </div>
@@ -226,21 +238,25 @@ function Overview() {
             </>
           ) : (
             <div className="h-80 flex items-center justify-center text-gray-500">
-              No supervisors assigned yet
+              <FiUserCheck className="text-4xl text-gray-300 mb-2" />
+              <p>No supervisors assigned yet</p>
             </div>
           )}
         </div>
 
         {/* Bar Chart */}
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">Projects Distribution Overview</h3>
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+            <FiBarChart2 className="text-green-500" size={18} />
+            Projects Distribution Overview
+          </h3>
           {barData.length > 0 && barData[0].projects > 0 ? (
             <>
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={barData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} />
+                    <XAxis dataKey="name" angle={-45} textAnchor="end" height={80} tick={{ fontSize: 11 }} />
                     <YAxis allowDecimals={false} />
                     <Tooltip />
                     <Legend />
@@ -248,42 +264,51 @@ function Overview() {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-              <div className="mt-4 text-center text-gray-600 text-sm">
+              <div className="mt-4 text-center text-gray-500 text-xs">
                 <p>X-Axis: Supervisors | Y-Axis: Number of Projects Assigned</p>
               </div>
             </>
           ) : (
             <div className="h-80 flex items-center justify-center text-gray-500">
-              No project data available
+              <FiBarChart2 className="text-4xl text-gray-300 mb-2" />
+              <p>No project data available</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6 mb-8">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-bold text-gray-800">Recent Activity</h3>
+          <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <FiActivity className="text-purple-500" size={18} />
+            Recent Activity
+          </h3>
           <button 
             onClick={() => window.location.href = '/admin#projects'}
-            className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+            className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1 transition-all"
           >
-            View All →
+            View All <FiEye size={14} />
           </button>
         </div>
         {activities.length > 0 ? (
           <div className="space-y-3">
             {activities.map((activity, index) => (
-              <div key={index} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all">
+              <div key={index} className="flex justify-between items-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all">
                 <div className="flex-1">
-                  <p className="text-gray-800 font-semibold">{activity.student}</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-gray-800 font-semibold flex items-center gap-2">
+                    <FiUser size={14} className="text-gray-400" />
+                    {activity.student}
+                  </p>
+                  <p className="text-sm text-gray-600 mt-1">
                     {activity.type === 'request' 
                       ? `has requested ${activity.teacher} to be their supervisor`
                       : `submitted proposal - Status: ${activity.status.toUpperCase()}`
                     }
                   </p>
-                  <p className="text-xs text-gray-400 mt-1">{activity.time}</p>
+                  <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                    <FiClock size={10} /> {activity.time}
+                  </p>
                 </div>
                 <div className="flex gap-2">
                   {activity.type === 'request' ? (
@@ -307,41 +332,44 @@ function Overview() {
           </div>
         ) : (
           <div className="text-center py-8 text-gray-500">
+            <FiActivity className="text-4xl text-gray-300 mx-auto mb-2" />
             No recent activities
           </div>
         )}
       </div>
 
       {/* Quick Actions */}
-      <div className="bg-white rounded-xl shadow-sm p-6">
-        <h3 className="text-xl font-bold text-gray-800 mb-4">Quick Actions</h3>
+      <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          ⚡ Quick Actions
+        </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <button 
             onClick={() => window.location.href = '/admin#students'}
-            className="bg-gradient-to-r from-blue-500 to-blue-600 text-white p-4 rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-3 justify-center"
+            className="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 hover:shadow-md"
           >
-            <span className="text-2xl">👨‍🎓</span>
+            <FiUserPlus size={18} />
             <span className="font-semibold">Add Student</span>
           </button>
           <button 
             onClick={() => window.location.href = '/admin#teachers'}
-            className="bg-gradient-to-r from-green-500 to-green-600 text-white p-4 rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-3 justify-center"
+            className="bg-green-600 hover:bg-green-700 text-white py-3 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 hover:shadow-md"
           >
-            <span className="text-2xl">👨‍🏫</span>
+            <FiUserPlus size={18} />
             <span className="font-semibold">Add Teacher</span>
           </button>
           <button 
             onClick={() => window.location.href = '/admin#projects'}
-            className="bg-gradient-to-r from-purple-500 to-purple-600 text-white p-4 rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-3 justify-center"
+            className="bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 hover:shadow-md"
           >
-            <span className="text-2xl">📊</span>
+            <FiBarChart2 size={18} />
             <span className="font-semibold">View Projects</span>
           </button>
           <button 
             onClick={() => window.location.href = '/admin#assign-supervisor'}
-            className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300 flex items-center gap-3 justify-center"
+            className="bg-orange-600 hover:bg-orange-700 text-white py-3 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 hover:shadow-md"
           >
-            <span className="text-2xl">👨‍🏫</span>
+            <FiUserCheck size={18} />
             <span className="font-semibold">Assign Supervisor</span>
           </button>
         </div>
