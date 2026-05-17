@@ -159,10 +159,10 @@ function Overview() {
   }
 
   const statsCards = [
-    { icon: FiUsers, label: 'Total Students', value: stats.totalStudents, color: 'from-blue-500 to-blue-600' },
-    { icon: FiUserCheck, label: 'Total Teachers', value: stats.totalTeachers, color: 'from-green-500 to-green-600' },
-    { icon: FiClock, label: 'Pending Requests', value: stats.pendingRequests, color: 'from-yellow-500 to-yellow-600' },
-    { icon: FiZap, label: 'Active Projects', value: stats.activeProjects, color: 'from-purple-500 to-purple-600' },
+    { icon: FiUsers, label: 'Total Students', value: stats.totalStudents },
+    { icon: FiUserCheck, label: 'Total Teachers', value: stats.totalTeachers },
+    { icon: FiClock, label: 'Pending Requests', value: stats.pendingRequests },
+    { icon: FiZap, label: 'Active Projects', value: stats.activeProjects },
   ]
 
   return (
@@ -173,18 +173,16 @@ function Overview() {
         <p className="text-gray-600">Manage the entire project management system and oversee all activities.</p>
       </div>
 
-      {/* Stats Cards with React Icons */}
+      {/* Stats Cards - White boxes with blue border on hover */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {statsCards.map((stat, index) => (
-          <div key={index} className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
-            <div className={`bg-gradient-to-r ${stat.color} p-5`}>
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-white text-sm opacity-90 mb-1">{stat.label}</p>
-                  <p className="text-white text-3xl font-bold">{stat.value}</p>
-                </div>
-                <stat.icon className="text-4xl text-white/80" />
+          <div key={index} className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm hover:border-blue-500 hover:shadow-md transition-all duration-300 cursor-pointer">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-500 mb-1">{stat.label}</p>
+                <p className="text-3xl font-bold text-gray-800">{stat.value}</p>
               </div>
+              <stat.icon className="text-4xl text-gray-400" />
             </div>
           </div>
         ))}
@@ -340,9 +338,7 @@ function Overview() {
 
       {/* Quick Actions */}
       <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-          ⚡ Quick Actions
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <button 
             onClick={() => window.location.href = '/admin#students'}
